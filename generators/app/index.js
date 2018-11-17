@@ -12,27 +12,25 @@ module.exports = class extends Generator {
 
     const prompts = [
       {
-        type: 'confirm',
-        name: 'someAnswer',
-        message: 'Would you like to enable this option?',
-        default: true
+        type: 'input',
+        name: 'baseName',
+        message: 'What is the name of your application?',
+        store: true,
+        default: 'myapp'
+      },
+      {
+        type: 'list',
+        name: 'handlerName',
+        message: 'What is the name to use handler?',
+        choices: ['helloWorld'],
+        default: 'helloWorld'
       }
     ];
 
     return this.prompt(prompts).then(props => {
-      // To access props later use this.props.someAnswer;
       this.props = props;
     });
   }
 
-  writing() {
-    this.fs.copy(
-      this.templatePath('dummyfile.txt'),
-      this.destinationPath('dummyfile.txt')
-    );
-  }
-
-  install() {
-    this.installDependencies();
-  }
+  writing() {}
 };
