@@ -5,7 +5,6 @@ const yosay = require('yosay');
 
 module.exports = class extends Generator {
   prompting() {
-    // Have Yeoman greet the user.
     this.log(
       yosay(`Welcome to the luminous ${chalk.red('generator-golang-lambda')} generator!`)
     );
@@ -32,5 +31,22 @@ module.exports = class extends Generator {
     });
   }
 
-  writing() {}
+  writing() {
+    this.fs.copyTpl(
+      this.templatePath(`_handler_${this.props.handlerName}.go`),
+      this.destinationPath(`${this.props.baseName}/handler.go`)
+    );
+    this.fs.copyTpl(
+      this.templatePath(`_event_${this.props.handlerName}.json`),
+      this.destinationPath(`${this.props.baseName}/event.json`)
+    );
+    this.fs.copyTpl(
+      this.templatePath(`_Gopkg_${this.props.handlerName}.toml`),
+      this.destinationPath(`${this.props.baseName}/Gopkg.toml`)
+    );
+    this.fs.copyTpl(
+      this.templatePath(`_Makefile`),
+      this.destinationPath(`${this.props.baseName}/Makefile`)
+    );
+  }
 };
