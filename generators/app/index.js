@@ -3,11 +3,31 @@ const Generator = require('yeoman-generator');
 const chalk = require('chalk');
 const yosay = require('yosay');
 
+class HelloWorldOptions {
+  getChoices() {
+    return ['a', 'b'];
+  }
+}
+
+class HelloWorldHandler {
+  getName() {
+    return 'Hello World';
+  }
+
+  getOptions() {
+    return new HelloWorldOptions();
+  }
+}
+
 module.exports = class extends Generator {
   prompting() {
     this.log(
       yosay(`Welcome to the luminous ${chalk.red('generator-golang-lambda')} generator!`)
     );
+
+    const handlerIns = {
+      helloWorld: new HelloWorldHandler()
+    };
 
     const prompts = [
       {
@@ -19,15 +39,25 @@ module.exports = class extends Generator {
       },
       {
         type: 'list',
-        name: 'handlerName',
+        name: 'handler',
         message: 'What is the name to use handler?',
-        choices: ['helloWorld'],
-        default: 'helloWorld'
+        choices: [{ name: 'Hello World', value: handlerIns.helloWorld }],
+        default: handlerIns.helloWorld
       }
     ];
 
     return this.prompt(prompts).then(props => {
       this.props = props;
+      return this.prompt([
+        {
+          type: 'list',
+          name: 'handlerOption',
+          message: `What function is ${props.handler.getName()} to use?`,
+          choices: props.handler.getOptions().getChoices()
+        }
+      ]).then(props => {
+        this.props.handlerOption = props.handlerOption;
+      });
     });
   }
 
