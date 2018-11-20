@@ -3,19 +3,32 @@ const Generator = require('yeoman-generator');
 const chalk = require('chalk');
 const yosay = require('yosay');
 
-class HelloWorldOptions {
-  getChoices() {
-    return ['a', 'b'];
-  }
-}
-
 class HelloWorldHandler {
-  getName() {
-    return 'Hello World';
+  constructor() {
+    this.name = 'helloWorld';
   }
 
-  getOptions() {
-    return new HelloWorldOptions();
+  getPrompts() {
+    return [
+      {
+        type: 'input',
+        name: 'memorySize',
+        message: 'What size is this lambda memory?',
+        default: '128'
+      }
+    ];
+  }
+
+  getCopyFilePaths(props) {
+    return [
+      { from: `_handler_${this.name}.go`, to: `${props.baseName}/handler.go` },
+      { from: `_event_${this.name}.json`, to: `${props.baseName}/event.json` },
+      { from: `_Gopkg_${this.name}.toml`, to: `${props.baseName}/Gopkg.toml` }
+    ];
+  }
+
+  getCopyTemplateFilePath(props) {
+    return [{ from: `_Makefile`, to: `${props.baseName}/Makefile` }];
   }
 }
 
@@ -28,7 +41,7 @@ module.exports = class extends Generator {
     const handlerIns = {
       helloWorld: new HelloWorldHandler()
     };
-
+    // TODO: aws credential export env promts append.
     const prompts = [
       {
         type: 'input',
@@ -48,35 +61,28 @@ module.exports = class extends Generator {
 
     return this.prompt(prompts).then(props => {
       this.props = props;
-      return this.prompt([
-        {
-          type: 'list',
-          name: 'handlerOption',
-          message: `What function is ${props.handler.getName()} to use?`,
-          choices: props.handler.getOptions().getChoices()
-        }
-      ]).then(props => {
-        this.props.handlerOption = props.handlerOption;
+      return this.prompt(props.handler.getPrompts()).then(props => {
+        this.props.handlerOptions = props;
       });
     });
   }
 
   writing() {
-    this.fs.copyTpl(
-      this.templatePath(`_handler_${this.props.handlerName}.go`),
-      this.destinationPath(`${this.props.baseName}/handler.go`)
-    );
-    this.fs.copyTpl(
-      this.templatePath(`_event_${this.props.handlerName}.json`),
-      this.destinationPath(`${this.props.baseName}/event.json`)
-    );
-    this.fs.copyTpl(
-      this.templatePath(`_Gopkg_${this.props.handlerName}.toml`),
-      this.destinationPath(`${this.props.baseName}/Gopkg.toml`)
-    );
-    this.fs.copyTpl(
-      this.templatePath(`_Makefile`),
-      this.destinationPath(`${this.props.baseName}/Makefile`)
-    );
+    const props = this.props;
+    this.props.handler.getCopyFilePaths(props).map(filePath => {
+      return this.fs.copy(
+        this.templatePath(filePath.from),
+        this.destinationPath(filePath.to)
+      );
+    });
+    this.props.handler.getCopyTemplateFilePath(props).map(filePath => {
+      return this.fs.copyTpl(
+        this.templatePath(filePath.from),
+        this.destinationPath(filePath.to),
+        {
+          props: props
+        }
+      );
+    });
   }
 };
