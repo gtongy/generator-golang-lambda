@@ -4,8 +4,8 @@ const chalk = require('chalk');
 const yosay = require('yosay');
 
 class HelloWorldHandler {
-  constructor() {
-    this.name = 'helloWorld';
+  constructor(name) {
+    this.name = name;
   }
 
   getPrompts() {
@@ -39,7 +39,7 @@ module.exports = class extends Generator {
     );
 
     const handlerIns = {
-      helloWorld: new HelloWorldHandler()
+      helloWorld: new HelloWorldHandler('helloWorld')
     };
     // TODO: aws credential export env promts append.
     const prompts = [
