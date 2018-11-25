@@ -1,6 +1,11 @@
 module.exports = class HelloWorldBoilerPlate {
   constructor(name) {
     this.name = name;
+    this.hasDependencyCommand = false;
+  }
+
+  getName() {
+    return this.name;
   }
 
   getPrompts() {

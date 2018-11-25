@@ -1,6 +1,14 @@
-module.exports = class S3UploadBoilerPlates {
+module.exports = class S3UploadBoilerPlate {
   constructor(name) {
     this.name = name;
+  }
+
+  getName() {
+    return this.name;
+  }
+
+  hasDependencyCommand() {
+    return this.hasDependencyCommand;
   }
 
   getPrompts() {
