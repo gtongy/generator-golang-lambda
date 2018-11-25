@@ -7,10 +7,6 @@ module.exports = class S3UploadBoilerPlate {
     return this.name;
   }
 
-  hasDependencyCommand() {
-    return this.hasDependencyCommand;
-  }
-
   getPrompts() {
     return [
       {

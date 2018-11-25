@@ -1,10 +1,46 @@
+# go build
 build:
+	GOOS=linux GOARCH=amd64 go build -o handler
+
+# build lambci/lambda:build-go1.x container
+docker-build:
 	docker run --rm -v "$(PWD)":/go/src/handler \
 	lambci/lambda:build-go1.x \
 	sh -c 'dep ensure && go build -o handler'
-run:
+
+# lambci/lambda:build-go1.x run in container
+docker-run:
 	docker run \
 	-e AWS_LAMBDA_FUNCTION_MEMORY_SIZE=<%= props.boilerplateOptions.memorySize %>" \
 	-e AWS_ACCESS_KEY_ID="$(AWS_ACCESS_KEY_ID)" \
 	-e AWS_SECRET_ACCESS_KEY="$(AWS_SECRET_ACCESS_KEY)" \
 	--rm -v "$(PWD)":/var/task lambci/lambda:go1.x handler
+<% if (props.boilerplate.getName() === 's3Upload' ) { %>
+# lambci/lambda:build-go1.x run localstack
+docker-run-localstack:
+	docker run \
+	--net="localstack_network" \
+	-e "AWS_LAMBDA_FUNCTION_MEMORY_SIZE=<%= props.boilerplateOptions.memorySize %>" \
+	-e AWS_ACCESS_KEY_ID="$(AWS_ACCESS_KEY_ID)" \
+	-e AWS_SECRET_ACCESS_KEY="$(AWS_SECRET_ACCESS_KEY)" \
+	--rm -v "$(PWD)":/var/task lambci/lambda:go1.x handler
+
+# create localstack containers
+docker-localstack:
+	TMPDIR=/private$TMPDIR docker-compose -f ./localstack/docker-compose.yml up -d
+
+# create localstack docker network
+docker-cn:
+	docker network create localstack_network
+
+# create-images
+create-images:
+	sh ./create-images.sh FILE_COUNTS=$(FILE_COUNTS)
+
+# zip handler
+zip-handler:
+	zip handler.zip ./handler
+
+# zip images
+zip-images:
+	zip sample.zip images/sample{$(START)..$(END)}.jpg<% } %>
