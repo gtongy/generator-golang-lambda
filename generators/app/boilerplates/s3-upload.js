@@ -1,4 +1,4 @@
-module.exports = class HelloWorldBoilerPlate {
+module.exports = class S3UploadBoilerPlates {
   constructor(name) {
     this.name = name;
   }
@@ -17,6 +17,9 @@ module.exports = class HelloWorldBoilerPlate {
   getCopyFilePaths(props) {
     return [
       { from: `_handler_${this.name}.go`, to: `${props.baseName}/handler.go` },
+      { from: `_s3.go`, to: `${props.baseName}/handler.go` },
+      { from: `_file.go`, to: `${props.baseName}/file.go` },
+      { from: `_create-images.sh`, to: `${props.baseName}/create-images.sh` },
       { from: `_event_${this.name}.json`, to: `${props.baseName}/event.json` },
       { from: `_Gopkg.toml`, to: `${props.baseName}/Gopkg.toml` }
     ];

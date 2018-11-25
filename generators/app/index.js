@@ -1,8 +1,10 @@
 'use strict';
+
 const Generator = require('yeoman-generator');
 const chalk = require('chalk');
 const yosay = require('yosay');
 const HelloWorldBoilerPlate = require('./boilerplates/hello-world');
+const S3UploadBoilerPlates = require('./boilerplates/s3-upload');
 
 module.exports = class extends Generator {
   prompting() {
@@ -11,9 +13,10 @@ module.exports = class extends Generator {
     );
 
     const boilerplateIns = {
-      helloWorld: new HelloWorldBoilerPlate('helloWorld')
+      helloWorld: new HelloWorldBoilerPlate('helloWorld'),
+      s3Upload: new S3UploadBoilerPlates('s3Upload')
     };
-    // TODO: aws credential export env promts append.
+
     const prompts = [
       {
         type: 'input',
@@ -26,7 +29,10 @@ module.exports = class extends Generator {
         type: 'list',
         name: 'boilerplate',
         message: 'What is the name to use boilerplate?',
-        choices: [{ name: 'Hello World', value: boilerplateIns.helloWorld }],
+        choices: [
+          { name: 'Hello World', value: boilerplateIns.helloWorld },
+          { name: 'S3 Upload', value: boilerplateIns.s3Upload }
+        ],
         default: boilerplateIns.helloWorld
       }
     ];
