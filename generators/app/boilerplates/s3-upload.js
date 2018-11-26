@@ -1,6 +1,11 @@
 module.exports = class S3UploadBoilerPlate {
-  constructor(name) {
-    this.name = name;
+  constructor(opts) {
+    this.name = opts.name;
+    this.needSetup = opts.needSetup;
+  }
+
+  isNeedSetup() {
+    return this.needSetup;
   }
 
   getName() {
@@ -14,6 +19,36 @@ module.exports = class S3UploadBoilerPlate {
         name: 'memorySize',
         message: 'What size is this lambda memory?',
         default: '128'
+      },
+      {
+        type: 'confirm',
+        name: 'isLaunchLocalstack',
+        message: 'Would you like to launch localstack? (default: No)',
+        default: false
+      },
+      {
+        type: 'confirm',
+        name: 'isCreateImages',
+        message: 'Would you like to create images? (default: No)',
+        default: false
+      },
+      {
+        type: 'input',
+        name: 'fileCounts',
+        message: 'How many images will you create?',
+        default: '10',
+        when: answer => {
+          return answer.isCreateImages;
+        }
+      },
+      {
+        type: 'input',
+        name: 'fileSize',
+        message: 'What is the size of one image?(KB)',
+        default: 100,
+        when: answer => {
+          return answer.isCreateImages;
+        }
       }
     ];
   }
@@ -31,5 +66,26 @@ module.exports = class S3UploadBoilerPlate {
 
   getCopyTemplateFilePaths(props) {
     return [{ from: `_Makefile`, to: `${props.baseName}/Makefile` }];
+  }
+
+  getSetupCommands(props) {
+    return [
+      {
+        command: `make`,
+        args: [`launch-localstack`],
+        isExec: props.boilerplateOptions.isLaunchLocalstack,
+        opts: {}
+      },
+      {
+        command: `make`,
+        args: [
+          `create-images`,
+          `FILE_COUNTS=${props.boilerplateOptions.fileCounts}`,
+          `FILE_SIZE=${props.boilerplateOptions.fileSize}`
+        ],
+        isExec: props.boilerplateOptions.isCreateImages,
+        opts: {}
+      }
+    ];
   }
 };

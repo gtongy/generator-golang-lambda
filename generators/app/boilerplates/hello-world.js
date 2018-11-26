@@ -1,7 +1,11 @@
 module.exports = class HelloWorldBoilerPlate {
-  constructor(name) {
-    this.name = name;
-    this.hasDependencyCommand = false;
+  constructor(opts) {
+    this.name = opts.name;
+    this.needSetup = opts.needSetup;
+  }
+
+  isNeedSetup() {
+    return this.needSetup;
   }
 
   getName() {

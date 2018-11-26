@@ -13,8 +13,14 @@ module.exports = class extends Generator {
     );
 
     const boilerplateIns = {
-      helloWorld: new HelloWorldBoilerPlate('helloWorld'),
-      s3Upload: new S3UploadBoilerPlate('s3Upload')
+      helloWorld: new HelloWorldBoilerPlate({
+        name: 'helloWorld',
+        needSetup: false
+      }),
+      s3Upload: new S3UploadBoilerPlate({
+        name: 's3Upload',
+        needSetup: true
+      })
     };
 
     const prompts = [
@@ -47,14 +53,11 @@ module.exports = class extends Generator {
 
   writing() {
     const props = this.props;
-    this.props.boilerplate.getCopyFilePaths(props).map(filePath => {
-      return this.fs.copy(
-        this.templatePath(filePath.from),
-        this.destinationPath(filePath.to)
-      );
+    this.props.boilerplate.getCopyFilePaths(props).forEach(filePath => {
+      this.fs.copy(this.templatePath(filePath.from), this.destinationPath(filePath.to));
     });
-    this.props.boilerplate.getCopyTemplateFilePaths(props).map(filePath => {
-      return this.fs.copyTpl(
+    this.props.boilerplate.getCopyTemplateFilePaths(props).forEach(filePath => {
+      this.fs.copyTpl(
         this.templatePath(filePath.from),
         this.destinationPath(filePath.to),
         {
@@ -64,5 +67,15 @@ module.exports = class extends Generator {
     });
   }
 
-  install() {}
+  install() {
+    const props = this.props;
+    if (this.props.boilerplate.isNeedSetup()) {
+      process.chdir(`./${props.baseName}`);
+      this.props.boilerplate.getSetupCommands(props).forEach(setupCommand => {
+        if (setupCommand.isExec) {
+          this.spawnCommand(setupCommand.command, setupCommand.args, setupCommand.opts);
+        }
+      });
+    }
+  }
 };

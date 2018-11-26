@@ -31,7 +31,10 @@ docker-localstack:
 
 # create localstack docker network
 docker-cn:
-	docker network create localstack_network
+	docker network create --driver bridge localstack_network || true
+
+# launch localstack
+launch-localstack: docker-cn docker-localstack
 
 # create-images
 create-images:
