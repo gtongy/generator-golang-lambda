@@ -16,26 +16,6 @@ docker-run:
 	-e AWS_SECRET_ACCESS_KEY="$(AWS_SECRET_ACCESS_KEY)" \
 	--rm -v "$(PWD)":/var/task lambci/lambda:go1.x handler
 <% if (props.boilerplate.getName() === 's3Upload' ) { %>
-# lambci/lambda:build-go1.x run localstack
-docker-run-localstack:
-	docker run \
-	--net="localstack_network" \
-	-e "AWS_LAMBDA_FUNCTION_MEMORY_SIZE=<%= props.boilerplateOptions.memorySize %>" \
-	-e AWS_ACCESS_KEY_ID="$(AWS_ACCESS_KEY_ID)" \
-	-e AWS_SECRET_ACCESS_KEY="$(AWS_SECRET_ACCESS_KEY)" \
-	--rm -v "$(PWD)":/var/task lambci/lambda:go1.x handler
-
-# create localstack containers
-docker-localstack:
-	TMPDIR=/private$TMPDIR docker-compose -f ./localstack/docker-compose.yml up -d
-
-# create localstack docker network
-docker-cn:
-	docker network create --driver bridge localstack_network || true
-
-# launch localstack
-launch-localstack: docker-cn docker-localstack
-
 # create-images
 create-images:
 	sh ./create-images.sh FILE_COUNTS=$(FILE_COUNTS)

@@ -21,9 +21,19 @@ module.exports = class S3UploadBoilerPlate {
         default: '128'
       },
       {
+        type: 'input',
+        name: 'bucketName',
+        message: 'What is the bucket name?'
+      },
+      {
+        type: 'input',
+        name: 'endpoint',
+        message: 'What is the endpoint?'
+      },
+      {
         type: 'confirm',
-        name: 'isLaunchLocalstack',
-        message: 'Would you like to launch localstack? (default: No)',
+        name: 'execDepEnsure',
+        message: 'Would you like to exec dep ensure? (default: No)',
         default: false
       },
       {
@@ -56,7 +66,7 @@ module.exports = class S3UploadBoilerPlate {
   getCopyFilePaths(props) {
     return [
       { from: `_handler_${this.name}.go`, to: `${props.baseName}/handler.go` },
-      { from: `_s3.go`, to: `${props.baseName}/handler.go` },
+      { from: `_s3.go`, to: `${props.baseName}/s3.go` },
       { from: `_file.go`, to: `${props.baseName}/file.go` },
       { from: `_create-images.sh`, to: `${props.baseName}/create-images.sh` },
       { from: `_event_${this.name}.json`, to: `${props.baseName}/event.json` },
@@ -71,9 +81,9 @@ module.exports = class S3UploadBoilerPlate {
   getSetupCommands(props) {
     return [
       {
-        command: `make`,
-        args: [`launch-localstack`],
-        isExec: props.boilerplateOptions.isLaunchLocalstack,
+        command: `dep`,
+        args: [`ensure`],
+        isExec: props.boilerplateOptions.execDepEnsure,
         opts: {}
       },
       {
