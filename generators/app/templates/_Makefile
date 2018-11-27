@@ -1,3 +1,4 @@
+JSON_FILE=`node -p "JSON.stringify(require('./event.json'))"`
 # go build
 build:
 	GOOS=linux GOARCH=amd64 go build -o handler
@@ -11,10 +12,10 @@ docker-build:
 # lambci/lambda:build-go1.x run in container
 docker-run:
 	docker run \
-	-e AWS_LAMBDA_FUNCTION_MEMORY_SIZE=<%= props.boilerplateOptions.memorySize %>" \
+	-e AWS_LAMBDA_FUNCTION_MEMORY_SIZE="<%= props.boilerplateOptions.memorySize %>" \
 	-e AWS_ACCESS_KEY_ID="$(AWS_ACCESS_KEY_ID)" \
 	-e AWS_SECRET_ACCESS_KEY="$(AWS_SECRET_ACCESS_KEY)" \
-	--rm -v "$(PWD)":/var/task lambci/lambda:go1.x handler
+	--rm -v "$(PWD)":/var/task lambci/lambda:go1.x handler "$(JSON_FILE)"
 <% if (props.boilerplate.getName() === 's3Upload' ) { %>
 # create-images
 create-images:
