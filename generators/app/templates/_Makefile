@@ -20,7 +20,20 @@ docker-run:
 	-e AWS_ACCESS_KEY_ID="$(AWS_ACCESS_KEY_ID)" \
 	-e AWS_SECRET_ACCESS_KEY="$(AWS_SECRET_ACCESS_KEY)" \
 	--rm -v "$(PWD)":/var/task lambci/lambda:go1.x handler "$(JSON_FILE)"
-<% if (props.boilerplate.getName() === 's3Upload' ) { %>
+<% if (props.boilerplate.getName() === 's3Upload' ) { %># create minio network
+minio-create-network:
+	docker network create minio_network
+
+# create bucket
+cb:
+	aws --endpoint-url=http://localhost:9000 \
+	--region ap-northeast-1 \
+	s3 mb s3://<%= props.boilerplateOptions.bucketName %>
+
+# minio container run
+minio-run:
+	docker-compose -f ./minio/docker-compose.yml up -d
+
 # create-images
 create-images:
 	sh ./create-images.sh FILE_COUNTS=$(FILE_COUNTS)
