@@ -65,33 +65,33 @@ module.exports = class S3UploadBoilerPlate {
 
   getCopyFilePaths(props) {
     return [
-      { from: `_file.go`, to: `${props.baseName}/file.go` },
-      { from: `_create-images.sh`, to: `${props.baseName}/create-images.sh` },
+      { from: '_file.go', to: `${props.baseName}/file.go` },
+      { from: '_create-images.sh', to: `${props.baseName}/create-images.sh` },
       { from: `_event_${this.name}.json`, to: `${props.baseName}/event.json` },
-      { from: `_Gopkg.toml`, to: `${props.baseName}/Gopkg.toml` }
+      { from: '_Gopkg.toml', to: `${props.baseName}/Gopkg.toml` }
     ];
   }
 
   getCopyTemplateFilePaths(props) {
     return [
-      { from: `_Makefile`, to: `${props.baseName}/Makefile` },
+      { from: '_Makefile', to: `${props.baseName}/Makefile` },
       { from: `_handler_${this.name}.go`, to: `${props.baseName}/handler.go` },
-      { from: `_s3.go`, to: `${props.baseName}/s3.go` }
+      { from: '_s3.go', to: `${props.baseName}/s3.go` }
     ];
   }
 
   getSetupCommands(props) {
     return [
       {
-        command: `dep`,
-        args: [`ensure`],
+        command: 'dep',
+        args: ['ensure'],
         isExec: props.boilerplateOptions.execDepEnsure,
         opts: {}
       },
       {
-        command: `make`,
+        command: 'make',
         args: [
-          `create-images`,
+          'create-images',
           `FILE_COUNTS=${props.boilerplateOptions.fileCounts}`,
           `FILE_SIZE=${props.boilerplateOptions.fileSize}`
         ],
