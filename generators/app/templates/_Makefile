@@ -1,4 +1,8 @@
 JSON_FILE=`node -p "JSON.stringify(require('./event.json'))"`
+# zip handler
+zip-handler:
+	zip handler.zip ./handler
+
 # go build
 build:
 	GOOS=linux GOARCH=amd64 go build -o handler
@@ -20,10 +24,6 @@ docker-run:
 # create-images
 create-images:
 	sh ./create-images.sh FILE_COUNTS=$(FILE_COUNTS)
-
-# zip handler
-zip-handler:
-	zip handler.zip ./handler
 
 # zip images
 zip-images:
