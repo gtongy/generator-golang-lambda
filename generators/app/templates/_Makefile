@@ -11,7 +11,7 @@ build:
 docker-build:
 	docker run --rm -v "$(PWD)":/go/src/handler \
 	lambci/lambda:build-go1.x \
-	sh -c 'dep ensure && go build -o handler'
+	sh -c 'dep ensure && go build *.go'
 
 # lambci/lambda:build-go1.x run in container
 docker-run:
@@ -24,15 +24,30 @@ docker-run:
 minio-create-network:
 	docker network create minio_network
 
-# create bucket
-cb:
+# make bucket
+mb:
 	aws --endpoint-url=http://localhost:9000 \
 	--region ap-northeast-1 \
 	s3 mb s3://<%= props.boilerplateOptions.bucketName %>
 
-# minio container run
-minio-run:
+# copy file to bucket
+cp:
+	aws --endpoint-url=http://localhost:9000 \
+	--region ap-northeast-1 \
+	--profile minio \
+	s3 cp sample.zip s3://s3-benchmark-bucket-dev --acl public-read
+
+# minio container wake up
+minio-up:
 	docker-compose -f ./minio/docker-compose.yml up -d
+
+dev-run:
+	docker run \
+	--net="minio_network" \
+	-e "AWS_LAMBDA_FUNCTION_MEMORY_SIZE=256" \
+	-e AWS_ACCESS_KEY_ID="dummydummydummy" \
+	-e AWS_SECRET_ACCESS_KEY="dummydummydummy" \
+	--rm -v "$(PWD)":/var/task lambci/lambda:go1.x handler "$(JSON_FILE)"
 
 # create-images
 create-images:

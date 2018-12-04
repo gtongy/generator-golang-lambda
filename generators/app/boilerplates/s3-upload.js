@@ -22,8 +22,13 @@ module.exports = class S3UploadBoilerPlate {
       },
       {
         type: 'input',
-        name: 'bucketName',
-        message: 'What is the bucket name?'
+        name: 'uploadBucketName',
+        message: 'What is the upload bucket name?'
+      },
+      {
+        type: 'input',
+        name: 'eventTriggerBucketName',
+        message: 'What is the event trigger bucket name?'
       },
       {
         type: 'input',
@@ -76,7 +81,11 @@ module.exports = class S3UploadBoilerPlate {
     return [
       { from: '_Makefile', to: `${props.baseName}/Makefile` },
       { from: `_handler_${this.name}.go`, to: `${props.baseName}/handler.go` },
-      { from: '_s3.go', to: `${props.baseName}/s3.go` }
+      { from: '_s3.go', to: `${props.baseName}/s3.go` },
+      {
+        from: 'minio/_docker-compose.yml',
+        to: `${props.baseName}/minio/docker-compose.yml`
+      }
     ];
   }
 
