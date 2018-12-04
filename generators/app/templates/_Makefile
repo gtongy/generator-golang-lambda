@@ -11,7 +11,7 @@ build:
 docker-build:
 	docker run --rm -v "$(PWD)":/go/src/handler \
 	lambci/lambda:build-go1.x \
-	sh -c 'dep ensure && go build *.go'
+	sh -c 'dep ensure && go build -o handler *.go'
 
 # lambci/lambda:build-go1.x run in container
 docker-run:
