@@ -36,7 +36,7 @@ module.exports = class S3UploadBoilerPlate {
         type: 'input',
         name: 'endpoint',
         message: 'What is the endpoint?',
-        default: 'minio:9000'
+        default: 'http://minio:9000'
       },
       {
         type: 'confirm',
@@ -81,7 +81,6 @@ module.exports = class S3UploadBoilerPlate {
     return [
       { from: '_file.go', to: `${props.baseName}/file.go` },
       { from: '_create-images.sh', to: `${props.baseName}/create-images.sh` },
-      { from: `_event_${this.name}.json`, to: `${props.baseName}/event.json` },
       { from: '_Gopkg.toml', to: `${props.baseName}/Gopkg.toml` }
     ];
   }
@@ -91,6 +90,7 @@ module.exports = class S3UploadBoilerPlate {
       { from: '_Makefile', to: `${props.baseName}/Makefile` },
       { from: `_handler_${this.name}.go`, to: `${props.baseName}/handler.go` },
       { from: '_s3.go', to: `${props.baseName}/s3.go` },
+      { from: `_event_${this.name}.json`, to: `${props.baseName}/event.json` },
       {
         from: 'minio/_docker-compose.yml',
         to: `${props.baseName}/minio/docker-compose.yml`
