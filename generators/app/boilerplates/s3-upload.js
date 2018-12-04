@@ -23,29 +23,38 @@ module.exports = class S3UploadBoilerPlate {
       {
         type: 'input',
         name: 'uploadBucketName',
-        message: 'What is the upload bucket name?'
+        message: 'What is the upload bucket name?',
+        default: 'upload-bucket'
       },
       {
         type: 'input',
         name: 'eventTriggerBucketName',
-        message: 'What is the event trigger bucket name?'
+        message: 'What is the event trigger bucket name?',
+        default: 'event-trigger-bucket'
       },
       {
         type: 'input',
         name: 'endpoint',
-        message: 'What is the endpoint?'
+        message: 'What is the endpoint?',
+        default: 'minio:9000'
       },
       {
         type: 'confirm',
         name: 'execDepEnsure',
-        message: 'Would you like to exec dep ensure? (default: No)',
-        default: false
+        message: 'Would you like to exec dep ensure? (default: Yes)',
+        default: true
       },
       {
         type: 'confirm',
         name: 'isCreateImages',
-        message: 'Would you like to create images? (default: No)',
-        default: false
+        message: 'Would you like to create images? (default: Yes)',
+        default: true
+      },
+      {
+        type: 'confirm',
+        name: 'isBuildLocalS3Container',
+        message: 'Would you like to build local s3 docker container? (default: Yes)',
+        default: true
       },
       {
         type: 'input',
@@ -105,6 +114,24 @@ module.exports = class S3UploadBoilerPlate {
           `FILE_SIZE=${props.boilerplateOptions.fileSize}`
         ],
         isExec: props.boilerplateOptions.isCreateImages,
+        opts: {}
+      },
+      {
+        command: 'make',
+        args: ['zip-images', 'START=1', `END=${props.boilerplateOptions.fileCounts}`],
+        isExec: props.boilerplateOptions.isCreateImages,
+        opts: {}
+      },
+      {
+        command: 'make',
+        args: ['minio-create-network'],
+        isExec: props.boilerplateOptions.isBuildLocalS3Container,
+        opts: {}
+      },
+      {
+        command: 'make',
+        args: ['minio-up'],
+        isExec: props.boilerplateOptions.isBuildLocalS3Container,
         opts: {}
       }
     ];

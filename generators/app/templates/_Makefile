@@ -22,20 +22,21 @@ docker-run:
 	--rm -v "$(PWD)":/var/task lambci/lambda:go1.x handler "$(JSON_FILE)"
 <% if (props.boilerplate.getName() === 's3Upload' ) { %># create minio network
 minio-create-network:
-	docker network create minio_network
+	docker network create minio_network || true
 
 # make bucket
 mb:
 	aws --endpoint-url=http://localhost:9000 \
 	--region ap-northeast-1 \
-	s3 mb s3://<%= props.boilerplateOptions.bucketName %>
+	--profile minio \
+	s3 mb s3://$(BUCKET_NAME)
 
 # copy file to bucket
 cp:
 	aws --endpoint-url=http://localhost:9000 \
 	--region ap-northeast-1 \
 	--profile minio \
-	s3 cp sample.zip s3://s3-benchmark-bucket-dev --acl public-read
+	s3 cp sample.zip s3://$(BUCKET_NAME) --acl public-read
 
 # minio container wake up
 minio-up:

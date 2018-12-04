@@ -72,7 +72,11 @@ module.exports = class extends Generator {
       process.chdir(`./${props.baseName}`);
       this.props.boilerplate.getSetupCommands(props).forEach(setupCommand => {
         if (setupCommand.isExec) {
-          this.spawnCommand(setupCommand.command, setupCommand.args, setupCommand.opts);
+          this.spawnCommandSync(
+            setupCommand.command,
+            setupCommand.args,
+            setupCommand.opts
+          );
         }
       });
     }

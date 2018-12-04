@@ -13,6 +13,15 @@ import (
 
 type File struct{}
 
+func (f *File) RemoveDir(path string) error {
+	if _, err := os.Stat(path); err == nil {
+		if err := os.RemoveAll(path); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (f *File) Decode(encoded, fileName string) {
 	data, err := base64.StdEncoding.DecodeString(encoded)
 	if err != nil {
