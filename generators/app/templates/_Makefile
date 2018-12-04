@@ -1,4 +1,8 @@
 JSON_FILE=`node -p "JSON.stringify(require('./event.json'))"`
+# zip handler
+zip-handler:
+	zip handler.zip ./handler
+
 # go build
 build:
 	GOOS=linux GOARCH=amd64 go build -o handler
@@ -7,7 +11,7 @@ build:
 docker-build:
 	docker run --rm -v "$(PWD)":/go/src/handler \
 	lambci/lambda:build-go1.x \
-	sh -c 'dep ensure && go build -o handler'
+	sh -c 'dep ensure && go build -o handler *.go'
 
 # lambci/lambda:build-go1.x run in container
 docker-run:
@@ -16,14 +20,39 @@ docker-run:
 	-e AWS_ACCESS_KEY_ID="$(AWS_ACCESS_KEY_ID)" \
 	-e AWS_SECRET_ACCESS_KEY="$(AWS_SECRET_ACCESS_KEY)" \
 	--rm -v "$(PWD)":/var/task lambci/lambda:go1.x handler "$(JSON_FILE)"
-<% if (props.boilerplate.getName() === 's3Upload' ) { %>
+<% if (props.boilerplate.getName() === 's3Upload' ) { %># create minio network
+minio-create-network:
+	docker network create minio_network || true
+
+# make bucket
+mb:
+	aws --endpoint-url=http://localhost:9000 \
+	--region ap-northeast-1 \
+	--profile minio \
+	s3 mb s3://$(BUCKET_NAME)
+
+# copy file to bucket
+cp:
+	aws --endpoint-url=http://localhost:9000 \
+	--region ap-northeast-1 \
+	--profile minio \
+	s3 cp sample.zip s3://$(BUCKET_NAME) --acl public-read
+
+# minio container wake up
+minio-up:
+	docker-compose -f ./minio/docker-compose.yml up -d
+
+dev-run:
+	docker run \
+	--net="minio_network" \
+	-e "AWS_LAMBDA_FUNCTION_MEMORY_SIZE=256" \
+	-e AWS_ACCESS_KEY_ID="dummydummydummy" \
+	-e AWS_SECRET_ACCESS_KEY="dummydummydummy" \
+	--rm -v "$(PWD)":/var/task lambci/lambda:go1.x handler "$(JSON_FILE)"
+
 # create-images
 create-images:
 	sh ./create-images.sh FILE_COUNTS=$(FILE_COUNTS)
-
-# zip handler
-zip-handler:
-	zip handler.zip ./handler
 
 # zip images
 zip-images:

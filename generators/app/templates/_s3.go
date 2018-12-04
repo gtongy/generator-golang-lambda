@@ -1,16 +1,18 @@
 package main
 
 import (
-	"log"
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
-const EndPoint = "<%= props.boilerplateOptions.endpoint %>"
+const (
+	EndPoint = "<%= props.boilerplateOptions.endpoint %>"
+)
 
 type S3Config struct {
 	Region string
@@ -30,17 +32,27 @@ func (so *S3Object) Init() {
 	}))
 }
 
-func (so *S3Object) Upload(f *os.File) (*s3manager.UploadOutput, error) {
-	uploader := s3manager.NewUploader(so.Session)
+func (so *S3Object) Download(f *os.File) error {
+	downloader := s3manager.NewDownloader(so.Session)
+	_, err := downloader.Download(f, &s3.GetObjectInput{
+		Bucket: aws.String(so.Bucket),
+		Key:    aws.String(so.Key),
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
-	// Upload the file to S3.
-	result, err := uploader.Upload(&s3manager.UploadInput{
+func (so *S3Object) Upload(f *os.File) error {
+	uploader := s3manager.NewUploader(so.Session)
+	_, err := uploader.Upload(&s3manager.UploadInput{
 		Bucket: aws.String(so.Bucket),
 		Key:    aws.String(so.Key),
 		Body:   f,
 	})
 	if err != nil {
-		log.Fatalf("failed to upload file, %v", err)
+		return err
 	}
-	return result, err
+	return nil
 }
