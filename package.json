@@ -1,19 +1,22 @@
 {
   "name": "generator-golang-lambda",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "this generator is create lambda development to use golang.",
   "homepage": "https://github.com/gtongy/generator-golang-lambda",
   "author": {
     "name": "gtongy",
     "email": "32930281+gtongy@users.noreply.github.com",
-    "url": ""
+    "url": "https://github.com/gtongy"
   },
   "files": [
     "generators"
   ],
-  "main": "generators/index.js",
+  "main": "generators/app/index.js",
   "keywords": [
-    "yeoman-generator"
+    "yeoman-generator",
+    "go",
+    "golang",
+    "lambda"
   ],
   "devDependencies": {
     "eslint": "^5.4.0",
