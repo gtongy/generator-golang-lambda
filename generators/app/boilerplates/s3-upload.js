@@ -2,6 +2,7 @@ module.exports = class S3UploadBoilerPlate {
   constructor(opts) {
     this.name = opts.name;
     this.needSetup = opts.needSetup;
+    this.awsRegions = opts.awsRegions;
   }
 
   isNeedSetup() {
@@ -19,6 +20,12 @@ module.exports = class S3UploadBoilerPlate {
         name: 'memorySize',
         message: 'What size is this lambda memory?',
         default: '128'
+      },
+      {
+        type: 'list',
+        name: 'region',
+        message: 'What is the aws region company?',
+        choices: this.awsRegions
       },
       {
         type: 'input',
