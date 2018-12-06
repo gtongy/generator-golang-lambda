@@ -27,14 +27,14 @@ minio-create-network:
 # make bucket
 mb:
 	aws --endpoint-url=http://localhost:9000 \
-	--region ap-northeast-1 \
+	--region <%= props.boilerplateOptions.region %> \
 	--profile minio \
 	s3 mb s3://$(BUCKET_NAME)
 
 # copy file to bucket
 cp:
 	aws --endpoint-url=http://localhost:9000 \
-	--region ap-northeast-1 \
+	--region <%= props.boilerplateOptions.region %> \
 	--profile minio \
 	s3 cp sample.zip s3://$(BUCKET_NAME) --acl public-read
 

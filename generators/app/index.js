@@ -5,6 +5,7 @@ const chalk = require('chalk');
 const yosay = require('yosay');
 const HelloWorldBoilerPlate = require('./boilerplates/hello-world');
 const S3UploadBoilerPlate = require('./boilerplates/s3-upload');
+const awsRegions = require('aws-regions');
 
 module.exports = class extends Generator {
   prompting() {
@@ -19,7 +20,10 @@ module.exports = class extends Generator {
       }),
       s3Upload: new S3UploadBoilerPlate({
         name: 's3Upload',
-        needSetup: true
+        needSetup: true,
+        awsRegions: awsRegions.list().map(awsRegion => {
+          return { name: awsRegion.name, value: awsRegion.code };
+        })
       })
     };
 
