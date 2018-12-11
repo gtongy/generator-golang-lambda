@@ -7,25 +7,25 @@ const HelloWorldBoilerPlate = require('./boilerplates/hello-world');
 const S3UploadBoilerPlate = require('./boilerplates/s3-upload');
 const awsRegions = require('aws-regions');
 
+const boilerplates = {
+  helloWorld: new HelloWorldBoilerPlate({
+    name: 'helloWorld',
+    needSetup: false
+  }),
+  s3Upload: new S3UploadBoilerPlate({
+    name: 's3Upload',
+    needSetup: true,
+    awsRegions: awsRegions.list().map(awsRegion => {
+      return { name: awsRegion.name, value: awsRegion.code };
+    })
+  })
+};
+
 module.exports = class extends Generator {
   prompting() {
     this.log(
       yosay(`Welcome to the luminous ${chalk.red('generator-golang-lambda')} generator!`)
     );
-
-    const boilerplateIns = {
-      helloWorld: new HelloWorldBoilerPlate({
-        name: 'helloWorld',
-        needSetup: false
-      }),
-      s3Upload: new S3UploadBoilerPlate({
-        name: 's3Upload',
-        needSetup: true,
-        awsRegions: awsRegions.list().map(awsRegion => {
-          return { name: awsRegion.name, value: awsRegion.code };
-        })
-      })
-    };
 
     const prompts = [
       {
@@ -39,10 +39,10 @@ module.exports = class extends Generator {
         name: 'boilerplate',
         message: 'What is the name to use boilerplate?',
         choices: [
-          { name: 'Hello World', value: boilerplateIns.helloWorld },
-          { name: 'S3 Upload', value: boilerplateIns.s3Upload }
+          { name: 'Hello World', value: boilerplates.helloWorld },
+          { name: 'S3 Upload', value: boilerplates.s3Upload }
         ],
-        default: boilerplateIns.helloWorld
+        default: boilerplates.helloWorld
       }
     ];
 
@@ -57,16 +57,15 @@ module.exports = class extends Generator {
   writing() {
     const props = this.props;
     this.props.boilerplate.getCopyFilePaths(props).forEach(filePath => {
-      this.fs.copy(this.templatePath(filePath.from), this.destinationPath(filePath.to));
-    });
-    this.props.boilerplate.getCopyTemplateFilePaths(props).forEach(filePath => {
-      this.fs.copyTpl(
-        this.templatePath(filePath.from),
-        this.destinationPath(filePath.to),
-        {
-          props: props
-        }
-      );
+      if (filePath.needProps) {
+        this.fs.copyTpl(
+          this.templatePath(filePath.from),
+          this.destinationPath(filePath.to),
+          { props: props }
+        );
+      } else {
+        this.fs.copy(this.templatePath(filePath.from), this.destinationPath(filePath.to));
+      }
     });
   }
 
