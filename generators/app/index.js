@@ -22,7 +22,7 @@ const boilerplates = {
 };
 
 module.exports = class extends Generator {
-  prompting() {
+  async prompting() {
     this.log(
       yosay(`Welcome to the luminous ${chalk.red('generator-golang-lambda')} generator!`)
     );
@@ -46,12 +46,10 @@ module.exports = class extends Generator {
       }
     ];
 
-    return this.prompt(prompts).then(props => {
-      this.props = props;
-      return this.prompt(props.boilerplate.getPrompts()).then(props => {
-        this.props.boilerplateOptions = props;
-      });
-    });
+    this.props = await this.prompt(prompts);
+    this.props.boilerplateOptions = await this.prompt(
+      this.props.boilerplate.getPrompts()
+    );
   }
 
   writing() {
