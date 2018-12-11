@@ -1,6 +1,15 @@
 module.exports = class HelloWorldBoilerPlate {
-  constructor(name) {
-    this.name = name;
+  constructor(opts) {
+    this.name = opts.name;
+    this.needSetup = opts.needSetup;
+  }
+
+  isNeedSetup() {
+    return this.needSetup;
+  }
+
+  getName() {
+    return this.name;
   }
 
   getPrompts() {
@@ -18,7 +27,7 @@ module.exports = class HelloWorldBoilerPlate {
     return [
       { from: `_handler_${this.name}.go`, to: `${props.baseName}/handler.go` },
       { from: `_event_${this.name}.json`, to: `${props.baseName}/event.json` },
-      { from: `_Gopkg_${this.name}.toml`, to: `${props.baseName}/Gopkg.toml` }
+      { from: `_Gopkg.toml`, to: `${props.baseName}/Gopkg.toml` }
     ];
   }
 

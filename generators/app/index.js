@@ -1,8 +1,11 @@
 'use strict';
+
 const Generator = require('yeoman-generator');
 const chalk = require('chalk');
 const yosay = require('yosay');
 const HelloWorldBoilerPlate = require('./boilerplates/hello-world');
+const S3UploadBoilerPlate = require('./boilerplates/s3-upload');
+const awsRegions = require('aws-regions');
 
 module.exports = class extends Generator {
   prompting() {
@@ -11,22 +14,34 @@ module.exports = class extends Generator {
     );
 
     const boilerplateIns = {
-      helloWorld: new HelloWorldBoilerPlate('helloWorld')
+      helloWorld: new HelloWorldBoilerPlate({
+        name: 'helloWorld',
+        needSetup: false
+      }),
+      s3Upload: new S3UploadBoilerPlate({
+        name: 's3Upload',
+        needSetup: true,
+        awsRegions: awsRegions.list().map(awsRegion => {
+          return { name: awsRegion.name, value: awsRegion.code };
+        })
+      })
     };
-    // TODO: aws credential export env promts append.
+
     const prompts = [
       {
         type: 'input',
         name: 'baseName',
         message: 'What is the name of your application?',
-        store: true,
         default: 'myapp'
       },
       {
         type: 'list',
         name: 'boilerplate',
         message: 'What is the name to use boilerplate?',
-        choices: [{ name: 'Hello World', value: boilerplateIns.helloWorld }],
+        choices: [
+          { name: 'Hello World', value: boilerplateIns.helloWorld },
+          { name: 'S3 Upload', value: boilerplateIns.s3Upload }
+        ],
         default: boilerplateIns.helloWorld
       }
     ];
@@ -41,14 +56,11 @@ module.exports = class extends Generator {
 
   writing() {
     const props = this.props;
-    this.props.boilerplate.getCopyFilePaths(props).map(filePath => {
-      return this.fs.copy(
-        this.templatePath(filePath.from),
-        this.destinationPath(filePath.to)
-      );
+    this.props.boilerplate.getCopyFilePaths(props).forEach(filePath => {
+      this.fs.copy(this.templatePath(filePath.from), this.destinationPath(filePath.to));
     });
-    this.props.boilerplate.getCopyTemplateFilePaths(props).map(filePath => {
-      return this.fs.copyTpl(
+    this.props.boilerplate.getCopyTemplateFilePaths(props).forEach(filePath => {
+      this.fs.copyTpl(
         this.templatePath(filePath.from),
         this.destinationPath(filePath.to),
         {
@@ -56,5 +68,21 @@ module.exports = class extends Generator {
         }
       );
     });
+  }
+
+  install() {
+    const props = this.props;
+    if (this.props.boilerplate.isNeedSetup()) {
+      process.chdir(`./${props.baseName}`);
+      this.props.boilerplate.getSetupCommands(props).forEach(setupCommand => {
+        if (setupCommand.isExec) {
+          this.spawnCommandSync(
+            setupCommand.command,
+            setupCommand.args,
+            setupCommand.opts
+          );
+        }
+      });
+    }
   }
 };

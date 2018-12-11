@@ -1,0 +1,16 @@
+version: "3"
+services:
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+    command: [server, /data]
+    environment:
+      - "MINIO_ACCESS_KEY=dummydummydummy"
+      - "MINIO_SECRET_KEY=dummydummydummy"
+      - "MINIO_REGION=<%= props.boilerplateOptions.region %>"
+    restart: always
+networks:
+  default:
+    external:
+      name: minio_network
