@@ -53,13 +53,12 @@ module.exports = class extends Generator {
   }
 
   writing() {
-    const props = this.props;
-    this.props.boilerplate.getCopyFilePaths(props).forEach(filePath => {
+    this.props.boilerplate.getCopyFilePaths(this.props).forEach(filePath => {
       if (filePath.needProps) {
         this.fs.copyTpl(
           this.templatePath(filePath.from),
           this.destinationPath(filePath.to),
-          { props: props }
+          { props: this.props }
         );
       } else {
         this.fs.copy(this.templatePath(filePath.from), this.destinationPath(filePath.to));
