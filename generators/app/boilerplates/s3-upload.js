@@ -86,27 +86,39 @@ module.exports = class S3UploadBoilerPlate {
 
   getCopyFilePaths(props) {
     return [
-      { from: '_file.go', to: `${props.baseName}/file.go`, needProps: false },
       {
-        from: '_create-images.sh',
+        from: `${this.name}/_file.go`,
+        to: `${props.baseName}/file.go`,
+        needProps: false
+      },
+      {
+        from: `${this.name}/_create-images.sh`,
         to: `${props.baseName}/create-images.sh`,
         needProps: false
       },
-      { from: '_Gopkg.toml', to: `${props.baseName}/Gopkg.toml`, needProps: false },
-      { from: '_Makefile', to: `${props.baseName}/Makefile`, needProps: true },
       {
-        from: `_handler_${this.name}.go`,
+        from: `${this.name}/_Gopkg.toml`,
+        to: `${props.baseName}/Gopkg.toml`,
+        needProps: false
+      },
+      {
+        from: `${this.name}/_Makefile`,
+        to: `${props.baseName}/Makefile`,
+        needProps: true
+      },
+      {
+        from: `${this.name}/_handler.go`,
         to: `${props.baseName}/handler.go`,
         needProps: true
       },
-      { from: '_s3.go', to: `${props.baseName}/s3.go`, needProps: true },
+      { from: `${this.name}/_s3.go`, to: `${props.baseName}/s3.go`, needProps: true },
       {
-        from: `_event_${this.name}.json`,
+        from: `${this.name}/_event.json`,
         to: `${props.baseName}/event.json`,
         needProps: true
       },
       {
-        from: 'minio/_docker-compose.yml',
+        from: `${this.name}/minio/_docker-compose.yml`,
         to: `${props.baseName}/minio/docker-compose.yml`,
         needProps: true
       }
@@ -146,6 +158,12 @@ module.exports = class S3UploadBoilerPlate {
       {
         command: 'make',
         args: ['minio-up'],
+        isExec: props.boilerplateOptions.isBuildLocalS3Container,
+        opts: {}
+      },
+      {
+        command: 'make',
+        args: ['docker-build'],
         isExec: props.boilerplateOptions.isBuildLocalS3Container,
         opts: {}
       }

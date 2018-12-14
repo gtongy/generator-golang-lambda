@@ -26,17 +26,25 @@ module.exports = class HelloWorldBoilerPlate {
   getCopyFilePaths(props) {
     return [
       {
-        from: `_handler_${this.name}.go`,
+        from: `${this.name}/_handler.go`,
         to: `${props.baseName}/handler.go`,
         needProps: false
       },
       {
-        from: `_event_${this.name}.json`,
+        from: `${this.name}/_event.json`,
         to: `${props.baseName}/event.json`,
         needProps: false
       },
-      { from: `_Gopkg.toml`, to: `${props.baseName}/Gopkg.toml`, needProps: false },
-      { from: `_Makefile`, to: `${props.baseName}/Makefile`, needProps: true }
+      {
+        from: `${this.name}/_Gopkg.toml`,
+        to: `${props.baseName}/Gopkg.toml`,
+        needProps: false
+      },
+      {
+        from: `${this.name}/_Makefile`,
+        to: `${props.baseName}/Makefile`,
+        needProps: true
+      }
     ];
   }
 };
