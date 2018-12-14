@@ -60,9 +60,9 @@ module.exports = class extends Generator {
           this.destinationPath(filePath.to),
           { props: this.props }
         );
-      } else {
-        this.fs.copy(this.templatePath(filePath.from), this.destinationPath(filePath.to));
+        return;
       }
+      this.fs.copy(this.templatePath(filePath.from), this.destinationPath(filePath.to));
     });
   }
 
