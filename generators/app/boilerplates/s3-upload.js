@@ -160,12 +160,6 @@ module.exports = class S3UploadBoilerPlate {
         args: ['minio-up'],
         isExec: props.boilerplateOptions.isBuildLocalS3Container,
         opts: {}
-      },
-      {
-        command: 'make',
-        args: ['docker-build'],
-        isExec: props.boilerplateOptions.isBuildLocalS3Container,
-        opts: {}
       }
     ];
   }
