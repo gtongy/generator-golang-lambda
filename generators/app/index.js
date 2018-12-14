@@ -5,23 +5,27 @@ const chalk = require('chalk');
 const yosay = require('yosay');
 const HelloWorldBoilerPlate = require('./boilerplates/hello-world');
 const S3UploadBoilerPlate = require('./boilerplates/s3-upload');
+const awsRegions = require('aws-regions');
+
+const boilerplates = {
+  helloWorld: new HelloWorldBoilerPlate({
+    name: 'helloWorld',
+    needSetup: false
+  }),
+  s3Upload: new S3UploadBoilerPlate({
+    name: 's3Upload',
+    needSetup: true,
+    awsRegions: awsRegions.list().map(awsRegion => {
+      return { name: awsRegion.name, value: awsRegion.code };
+    })
+  })
+};
 
 module.exports = class extends Generator {
-  prompting() {
+  async prompting() {
     this.log(
       yosay(`Welcome to the luminous ${chalk.red('generator-golang-lambda')} generator!`)
     );
-
-    const boilerplateIns = {
-      helloWorld: new HelloWorldBoilerPlate({
-        name: 'helloWorld',
-        needSetup: false
-      }),
-      s3Upload: new S3UploadBoilerPlate({
-        name: 's3Upload',
-        needSetup: true
-      })
-    };
 
     const prompts = [
       {
@@ -35,34 +39,30 @@ module.exports = class extends Generator {
         name: 'boilerplate',
         message: 'What is the name to use boilerplate?',
         choices: [
-          { name: 'Hello World', value: boilerplateIns.helloWorld },
-          { name: 'S3 Upload', value: boilerplateIns.s3Upload }
+          { name: 'Hello World', value: boilerplates.helloWorld },
+          { name: 'S3 Upload', value: boilerplates.s3Upload }
         ],
-        default: boilerplateIns.helloWorld
+        default: boilerplates.helloWorld
       }
     ];
 
-    return this.prompt(prompts).then(props => {
-      this.props = props;
-      return this.prompt(props.boilerplate.getPrompts()).then(props => {
-        this.props.boilerplateOptions = props;
-      });
-    });
+    this.props = await this.prompt(prompts);
+    this.props.boilerplateOptions = await this.prompt(
+      this.props.boilerplate.getPrompts()
+    );
   }
 
   writing() {
-    const props = this.props;
-    this.props.boilerplate.getCopyFilePaths(props).forEach(filePath => {
+    this.props.boilerplate.getCopyFilePaths(this.props).forEach(filePath => {
+      if (filePath.needProps) {
+        this.fs.copyTpl(
+          this.templatePath(filePath.from),
+          this.destinationPath(filePath.to),
+          { props: this.props }
+        );
+        return;
+      }
       this.fs.copy(this.templatePath(filePath.from), this.destinationPath(filePath.to));
-    });
-    this.props.boilerplate.getCopyTemplateFilePaths(props).forEach(filePath => {
-      this.fs.copyTpl(
-        this.templatePath(filePath.from),
-        this.destinationPath(filePath.to),
-        {
-          props: props
-        }
-      );
     });
   }
 

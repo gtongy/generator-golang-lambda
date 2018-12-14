@@ -4,7 +4,6 @@ import (
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
@@ -12,6 +11,7 @@ import (
 
 const (
 	EndPoint = "<%= props.boilerplateOptions.endpoint %>"
+	Region   = "<%= props.boilerplateOptions.region %>"
 )
 
 type S3Config struct {
@@ -28,7 +28,7 @@ func (so *S3Object) Init() {
 	so.Session = session.Must(session.NewSession(&aws.Config{
 		S3ForcePathStyle: aws.Bool(true),
 		Endpoint:         aws.String(EndPoint),
-		Region:           aws.String(endpoints.ApNortheast1RegionID),
+		Region:           aws.String(Region),
 	}))
 }
 
