@@ -41,8 +41,8 @@ cp:
 	--profile minio \
 	s3 cp sample.zip s3://$(BUCKET_NAME) --acl public-read
 
-# minio container wake up
-minio-up:
+# minio container docker-compose up
+fig-up-minio:
 	docker-compose -f ./minio/docker-compose.yml up -d
 
 docker-run-minio:
